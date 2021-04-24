@@ -1,9 +1,9 @@
-1.
-2.
-3.
-4.
-5.
-6.
-7.
-8.
-9.
+1. % gdb --args a.out 1 2 3 	% lldb -- a.out 1 2 3
+2. (gdb) break test.c:12	(lldb) b test.c:12
+3. (gdb) next			(lldb) next
+4. (gdb) step			(lldb) step
+5. (gdb) continue		(lldb) continue
+6. (gdb) print name		(lldb) print name
+7. (gdb) display name		(lldb) display name
+8. (gdb) info locals		(lldb) frame variable
+9. (gdb) quit			(lldb) quit
