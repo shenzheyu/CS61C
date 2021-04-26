@@ -39,48 +39,63 @@ HashTable *dictionary;
  * the grading process.
  */
 int main(int argc, char **argv) {
-  if (argc != 2) {
-    fprintf(stderr, "Specify a dictionary\n");
+    freopen("./sampleInput","r",stdin);
+//  freopen("./output", "w", stdout);
+
+    if (argc != 2) {
+        fprintf(stderr, "Specify a dictionary\n");
+        return 0;
+    }
+    /*
+     * Allocate a hash table to store the dictionary.
+     */
+    fprintf(stderr, "Creating hashtable\n");
+    dictionary = createHashTable(2255, &stringHash, &stringEquals);
+
+    fprintf(stderr, "Loading dictionary %s\n", argv[1]);
+    readDictionary(argv[1]);
+    fprintf(stderr, "Dictionary loaded\n");
+
+    fprintf(stderr, "Processing stdin\n");
+    processInput();
+
+    /*
+     * The MAIN function in C should always return 0 as a way of telling
+     * whatever program invoked this that everything went OK.
+     */
     return 0;
-  }
-  /*
-   * Allocate a hash table to store the dictionary.
-   */
-  fprintf(stderr, "Creating hashtable\n");
-  dictionary = createHashTable(2255, &stringHash, &stringEquals);
-
-  fprintf(stderr, "Loading dictionary %s\n", argv[1]);
-  readDictionary(argv[1]);
-  fprintf(stderr, "Dictionary loaded\n");
-
-  fprintf(stderr, "Processing stdin\n");
-  processInput();
-
-  /*
-   * The MAIN function in C should always return 0 as a way of telling
-   * whatever program invoked this that everything went OK.
-   */
-  return 0;
 }
 
 /*
  * This should hash a string to a bucket index.  Void *s can be safely cast
- * to a char * (null terminated string) and is already done for you here 
+ * to a char * (null terminated string) and is already done for you here
  * for convenience.
  */
 unsigned int stringHash(void *s) {
-  char *string = (char *)s;
-  // -- TODO --
+    char *string = (char *)s;
+    // -- TODO --
+
+    int intRep = 0;
+    int i;
+    for (i = 0; i < strlen(string); i++) {
+        intRep *= 27;
+        intRep += string[i] - 'A';
+    }
+    return intRep % 2255;
+
 }
 
 /*
- * This should return a nonzero value if the two strings are identical 
+ * This should return a nonzero value if the two strings are identical
  * (case sensitive comparison) and 0 otherwise.
  */
 int stringEquals(void *s1, void *s2) {
-  char *string1 = (char *)s1;
-  char *string2 = (char *)s2;
-  // -- TODO --
+    char *string1 = (char *)s1;
+    char *string2 = (char *)s2;
+    // -- TODO --
+
+    return strcmp(string1, string2) ? 0 : 1;
+
 }
 
 /*
@@ -100,14 +115,31 @@ int stringEquals(void *s1, void *s2) {
  * arbitrarily long dictionary chacaters.
  */
 void readDictionary(char *dictName) {
-  // -- TODO --
+    // -- TODO --
+
+    FILE *fp = NULL;
+    char *buff;
+
+    if ((fp = fopen(dictName, "r")) == NULL) {
+        fprintf(stderr, "File cannot be opened/n");
+        exit(1);
+    }
+
+    while (!feof(fp)) {
+        buff = (char *) malloc(60 * sizeof(char));
+        fscanf(fp, "%s", buff);
+        insertData(dictionary, (void *)buff, 1);
+    }
+
+    fclose(fp);
+
 }
 
 /*
  * This should process standard input (stdin) and copy it to standard
- * output (stdout) as specified in the spec (e.g., if a standard 
- * dictionary was used and the string "this is a taest of  this-proGram" 
- * was given to stdin, the output to stdout should be 
+ * output (stdout) as specified in the spec (e.g., if a standard
+ * dictionary was used and the string "this is a taest of  this-proGram"
+ * was given to stdin, the output to stdout should be
  * "this is a teast [sic] of  this-proGram").  All words should be checked
  * against the dictionary as they are input, then with all but the first
  * letter converted to lowercase, and finally with all letters converted
@@ -121,9 +153,53 @@ void readDictionary(char *dictName) {
  *
  * Do note that even under the initial assumption that no word is longer than 60
  * characters, you may still encounter strings of non-alphabetic characters (e.g.,
- * numbers and punctuation) which are longer than 60 characters. Again, for the 
+ * numbers and punctuation) which are longer than 60 characters. Again, for the
  * final 20% of your grade, you cannot assume words have a bounded length.
  */
 void processInput() {
-  // -- TODO --
+    // -- TODO --
+
+    char c;
+    char *string = (char *)malloc(60 * sizeof(char));
+    char *lowercase_string = (char *)malloc(60 * sizeof(char));
+    char *another_lowercase_string = (char *)malloc(60 * sizeof(char));
+    while (c = getchar()) {
+        if (c >= 'A' && c <= 'z') {
+            strncat(string, &c, 1);
+        } else {
+            if (strlen(string) != 0) {
+                int i;
+                for (i = 0; i < strlen(string) + 1; i++) {
+                    if (i == 0) {
+                        lowercase_string[i] = tolower(string[i]);
+                        another_lowercase_string[i] = string[i];
+                    } else {
+                        lowercase_string[i] = tolower(string[i]);
+                        another_lowercase_string[i] = tolower(string[i]);
+                    }
+                }
+
+                if (findData(dictionary, (void *)string) != 0) {
+                    printf("%s", string);
+                    string[0] = '\0';
+                } else if (findData(dictionary, (void *)lowercase_string) != 0) {
+                    printf("%s", string);
+                    string[0] = '\0';
+                } else if (findData(dictionary, (void *)another_lowercase_string) != 0) {
+                    printf("%s", string);
+                    string[0] = '\0';
+                } else {
+                    printf("%s [sic]", string);
+                    string[0] = '\0';
+                }
+            }
+
+            if (c == EOF) {
+                break;
+            } else {
+                printf("%c", c);
+            }
+        }
+    }
+
 }

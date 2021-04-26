@@ -20,14 +20,18 @@
  * for equality.
  */
 struct HashBucket {
-  void *key;
-  void *data;
-  struct HashBucket *next;
+    void *key;
+    void *data;
+    struct HashBucket *next;
 };
 
 typedef struct HashTable {
-  // -- TODO --
-  // HINT: Take a look at createHashTable.
+    // -- TODO --
+    // HINT: Take a look at createHashTable.
+    int size;
+    struct HashBucket **data;
+    unsigned int (*hashFunction)(void *);
+    int (*equalFunction)(void *, void *);
 } HashTable;
 
 /*
@@ -50,7 +54,7 @@ extern void insertData(HashTable *table, void *key, void *data);
 
 /*
  * This returns the corresponding data for a given key.
- * It returns NULL if the key is not found. 
+ * It returns NULL if the key is not found.
  */
 extern void *findData(HashTable *table, void *key);
 
